@@ -1,0 +1,10 @@
+[project]
+name = "image-generator"
+version = "0.1.0"
+description = "Self-developed image generator without any censorship and capable of generating nsfw contents"
+
+[tool.setuptools]
+packages = ["src"]
+
+[tool.setuptools.packages.find]
+where = ["src"]

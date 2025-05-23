@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 import torch
 from diffusers import StableDiffusionXLPipeline, AutoencoderKL, EulerAncestralDiscreteScheduler
@@ -6,31 +7,28 @@ from PIL import Image
 import os
 import gc
 
-BASE_MODEL_PATH = "../models/checkpoints/perfect_pony/prefectPonyXL_v50.safetensors"
-LORA_DIR = "../models/lora"
-VAE_PATH = "madebyollin/sdxl-vae-fp16-fix"
-LORA_NAME = "MoriiMee_Gothic_Niji_Style__Pony_LoRA.safetensors"
+from src.domain.lora import LORA_DIR, LoraInfo, LORA_NAME
+from src.service.utils import get_root_path
 
-class LoraInfo:
-    def __init__(self, name: str = LORA_NAME, scale: float = 0.8, lora_dir: str = LORA_DIR):
-        self.name = name
-        self.scale = scale
-        self.path = Path(lora_dir) / name if not Path(name).is_absolute() else Path(name)
+BASE_MODEL_PATH = get_root_path()/"models/checkpoints/perfect_pony/prefectPonyXL_v50.safetensors"
+
+VAE_PATH = "madebyollin/sdxl-vae-fp16-fix"
+
 
 class Workflow:
     def __init__(
         self,
-        base_model_path: str,
+        base_model_path: Path,
         vae_path: str = VAE_PATH,
-        lora_dir: str = LORA_DIR,
+        lora_dir: Path = LORA_DIR,
         device: str = "cuda",
         torch_dtype=torch.float16
     ):
-        self.base_model_path = Path(base_model_path).resolve()
-        self.vae_path = vae_path # We use a default online vae here
-        self.device = device
+        self.base_model_path: Path = base_model_path
+        self.vae_path: str = vae_path # We use a default online vae here
+        self.device: str = device
         self.dtype = torch_dtype
-        self.lora_dir = Path(lora_dir).resolve()
+        self.lora_dir: Path = lora_dir
         self.pipe = None
 
     def _init_pipeline(self):
@@ -77,11 +75,11 @@ class Workflow:
         self,
         pos_prompt: str,
         neg_prompt: str = "low quality, blurry, worst quality, bad anatomy, disfigured, malformed limbs",
-        num_inference_steps: int = 30,
-        guidance_scale: float = 7.0,
+        num_inference_steps: int = 20,
+        cfg: float = 7.0,
         height: int = 1024,
         width: int = 1024,
-        loras: list[LoraInfo] | None = None,
+        loras: List[LoraInfo] | None = None,
         seed: int = None
     ) -> Image.Image | None:
         if self.pipe is None:
@@ -121,7 +119,7 @@ class Workflow:
                     prompt=pos_prompt,
                     negative_prompt=neg_prompt,
                     num_inference_steps=num_inference_steps,
-                    guidance_scale=guidance_scale,
+                    guidance_scale=cfg,
                     height=height,
                     width=width,
                     generator=generator,

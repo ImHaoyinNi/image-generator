@@ -1,2 +1,2 @@
-POS_PROMPT_PREFIX = "masterpiece, best quality, score_9, score_8_up, score_7_up, detailed, beautiful, dynamic pose, sexy pose,"
+POS_PROMPT_PREFIX = "masterpiece, best quality, score_9, score_8_up, score_7_up, detailed, beautiful, dynamic pose, sexy pose, realistic, detailed eyes, eye liner,"
 NEG_PROMPT_PREFIX = "worst quality, low quality, error, bad anatomy, bad hands, watermark, ugly, distorted, censored, signature, 3D, logo, extra fingers, extra limbs,"
